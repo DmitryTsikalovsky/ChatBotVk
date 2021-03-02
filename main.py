@@ -9,6 +9,10 @@ db = client["charbotbd"]
 colLessons = db["lessons"]
 colUsers = db["users"]
 
+# Поток:
+# Получить институт
+# Получить курс
+# Обратиться к функции 1 и получить от неё имя предмета
 def searchLessonsName(instituteName, semestrNumber, colLessons):
     lessonsList = colLessons.find({"institutename": instituteName, "semestr": semestrNumber})
     message = "Доступные предметы: \n"
@@ -18,11 +22,13 @@ def searchLessonsName(instituteName, semestrNumber, colLessons):
         array.append(item["lessonname"])
         message = message + str(i+1) + ")" + item["lessonname"] + "\n"
         i += 1
-
+    # Введите номер предмета который вам нужен
+    # Получить число и проверить на i
     #Отправляем сформированное сообщение, получаем цифру, выбранную пользователем, и возвращаем имя предмата
-    return array[i-1] #Поменять на номер (на один меньше) который присылает пользователь
+    return array[i-1] #Поменять i на номер (на один меньше) который присылает пользователь
+    # Возвращаем введёный номер предмета
 
-#message = searchLessonsName("ИИКС", 1, colLessons)
+# message = searchLessonsName("ИИКС", 1, colLessons)
 
 def searchHelp(instituteName, semestrNumber, lessonName, colUsers):
     usersList = colUsers.find({"status": True,"lessons": { '$elemMatch': {"institutename": instituteName, "semestr": semestrNumber, "lessonname":lessonName}}})
@@ -30,9 +36,16 @@ def searchHelp(instituteName, semestrNumber, lessonName, colUsers):
     for item in usersList:
         message = message + "@" + item["vkid"] + "(" + item["username"] + ")\n"
 
-    return message
-
+    return message #@1231231(Дмитирй)\n
+# Отправили пользователю
 #searchHelp("ИИКС", 1, "Матанализ", colUsers)
+
+# Поток:
+# Получтить вкайди
+# Узнать институт
+# Узнать семестр
+# Обратиться к функции номер 1 - получить имя предмета
+# Обратиться к функции номер 2 - добавить предмет к пользоватею
 
 def addUserToLesson(vkId, instituteName, semestrNumber,lessonName, colUsers):
     check = colUsers.find_one({"vkid": vkId, "lessons": { '$elemMatch': {"institutename": instituteName, "semestr": semestrNumber, "lessonname":lessonName}}})
