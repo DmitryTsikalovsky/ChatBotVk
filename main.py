@@ -36,14 +36,14 @@ def searchLessonsName(instituteName, semestrNumber, colLessons, event, start_key
             if event.to_me:
                 request = event.text.lower()
                 i = int(request)
-                lessonsName = array[i-1]
+                lessonName = array[i-1]
                 if temp == 1:
-                    message = searchHelp(instituteName, semestrNumber, lessonsName, colUsers)
+                    message = searchHelp(instituteName, semestrNumber, lessonName, colUsers)
                     write_msg(event.user_id, f"Ваши данные: {message}", start_key) 
                     return array[i-1]
                 if temp == 2:
-                    addUserToLesson(event.user_id, instituteName, semestrNumber, lessonsName, colUsers)
-                    write_msg(event.user_id, f"Данные успешно обновлены {str(event.user_id)}, {instituteName}, {semestrNumber}, {lessonsName}", start_key)
+                    addUserToLesson(event.user_id, instituteName, semestrNumber, lessonName, colUsers)
+                    write_msg(event.user_id, f"Данные успешно обновлены {event.user_id}, {instituteName}, {semestrNumber}, {lessonName}", start_key)
                     return array[i-1]
 
 
@@ -51,7 +51,7 @@ def searchHelp(instituteName, semestrNumber, lessonName, colUsers):
     usersList = colUsers.find({"status": True,"lessons": { '$elemMatch': {"institutename": instituteName, "semestr": semestrNumber, "lessonname":lessonName}}})
     message = ""
     for item in usersList:
-        message = message + "https://vk.com/id" + item["vkid"] + " (" + item["username"] + ")\n"
+        message = message + "https://vk.com/id" + str(item["vkid"]) + " (" + item["username"] + ")\n"
 
     return message 
 
