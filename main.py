@@ -46,7 +46,6 @@ def searchLessonsName(instituteName, semestrNumber, colLessons, event, start_key
                     write_msg(event.user_id, f"Данные успешно обновлены {event.user_id}, {instituteName}, {semestrNumber}, {lessonName}", start_key)
                     return array[i-1]
 
-
 def searchHelp(instituteName, semestrNumber, lessonName, colUsers):
     usersList = colUsers.find({"status": True,"lessons": { '$elemMatch': {"institutename": instituteName, "semestr": semestrNumber, "lessonname":lessonName}}})
     message = ""
@@ -59,7 +58,6 @@ def addUserToLesson(vkId, instituteName, semestrNumber,lessonName, colUsers):
     check = colUsers.find_one({"vkid": vkId, "lessons": { '$elemMatch': {"institutename": instituteName, "semestr": semestrNumber, "lessonname":lessonName}}})
     if check == None:
         user = colUsers.update_one({"vkid": vkId}, { '$push': { "lessons": { "institutename": instituteName, "semestr": semestrNumber, "lessonname": lessonName } } })
-
 
 def get_keyboard(buts):
     nb = []
@@ -77,6 +75,14 @@ def get_keyboard(buts):
     first_keyboard = json.dumps(first_keyboard, ensure_ascii=False).encode('utf-8')
     first_keyboard = str(first_keyboard.decode('utf-8'))
     return first_keyboard
+
+def get_name(user_id):
+    info = vk_session.method('users.get', {'user_ids': user_id})
+    info = info[0]
+    first_name = info['first_name']
+    last_name = info['last_name']
+    name = first_name + ' ' + last_name
+    return name
 
 def write_msg_text(id, text):
     vk_session.method('messages.send', {'user_id': id, 'message': text, 'random_id': 0})
@@ -107,40 +113,37 @@ def main():
             [('ИФТЭБ', 'синий'), ('ИМО', 'белый'), ('ФБИУКС', 'синий')]
         ]
     )
-    while(True):
-        for event in longpoll.listen():
-            if event.type == VkEventType.MESSAGE_NEW:
-                if event.to_me:
-                    request = event.text.lower()
-                    id = event.user_id
-                    if request == 'начать':
-                        write_msg(event.user_id, "Выбирайте:", choice_key)
-                        for event in longpoll.listen():
-                            if event.type == VkEventType.MESSAGE_NEW:
-                                if event.to_me:
-                                    request = event.text.lower()
-                                    what_want = request
-                        
-                                    write_msg(event.user_id, "Выберите институт", institute_key)
-                                    for event in longpoll.listen():
-                                        if event.type == VkEventType.MESSAGE_NEW:
-                                            if event.to_me:
-                                                request = event.text.lower()
-                                                instituteName = request
-                                                write_msg_text(event.user_id, "Введите семестр")
-                                                for event in longpoll.listen():
-                                                    if event.type == VkEventType.MESSAGE_NEW:
-                                                        if event.to_me:
-                                                            request = event.text.lower()
-                                                            semestrNumber = request
-                                                            semestrNumber = int(semestrNumber)
-                                                            instituteName = instituteName.upper()
-                                                            if semestrNumber>0 and semestrNumber<12:
-                                                                if what_want == 'ищу помощь':
-                                                                    lessonsName = searchLessonsName(instituteName, semestrNumber, colLessons, event, start_key, 1)
-                                                                if what_want == 'хочу помочь':
-                                                                    lessonsName = searchLessonsName(instituteName, semestrNumber, colLessons, event, start_key, 2)
 
+    step = 1
+    for event in longpoll.listen():
+        if event.type == VkEventType.MESSAGE_NEW:
+            if event.to_me:
+                request = event.text.lower()
+                name = get_name(event.user_id)
+                info = vk_session.method('users.get', {'user_ids': event.user_id})
+                if step == 1:
+                    write_msg(event.user_id, "Выбирайте: ", choice_key)
+
+                if step == 2:
+                    what_want = request
+                    write_msg(event.user_id, "Выберите институт", institute_key)
+
+                if step == 3:
+                    instituteName = request
+                    instituteName = instituteName.upper()
+                    write_msg_text(event.user_id, "Введите семестр")
+
+                if step == 4:
+                    semestrNumber = request
+                    semestrNumber = int(semestrNumber)
+                    if semestrNumber>0 and semestrNumber<12:
+                        if what_want == 'ищу помощь':
+                            lessonsName = searchLessonsName(instituteName, semestrNumber, colLessons, event, start_key, 1)
+                        if what_want == 'хочу помочь':
+                            lessonsName = searchLessonsName(instituteName, semestrNumber, colLessons, event, start_key, 2)
+                    step = 0
+                                       
+                step +=1
 
 while True:
     main()
