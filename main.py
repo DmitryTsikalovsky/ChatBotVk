@@ -7,8 +7,7 @@ import requests
 import vk_api, json
 from vk_api.longpoll import VkLongPoll, VkEventType
 
-main_token = "ee861bd7c946a561144d9a2899379557354701e61c9f44d19ff828e17a5cfc5166822c13addb40fafeefc"  # моя группа
-#main_token = "8c20fd59534bd074cc126ee189b7d533a06fb0d92c70ba6f9ad629d0e7e956ec2ce599cd6b12b11e377c8" # чат бот в группе
+main_token = "8c20fd59534bd074cc126ee189b7d533a06fb0d92c70ba6f9ad629d0e7e956ec2ce599cd6b12b11e377c8" # чат бот в группе
 
 # Подключение к вк
 vk_session = vk_api.VkApi(token=main_token)
@@ -79,7 +78,6 @@ def addUserToLesson(vkId, instituteName, semestrNumber, lessonName, userName, co
         colUsers.insert_one({"vkid": vkId, "username": userName, "status": True, "lessons": [
             {"institutename": lesson["institutename"], "semestr": semestrNumber, "lessonname": lessonName}]})
 
-
 def get_keyboard(buts):
     nb = []
     color = ''
@@ -98,14 +96,12 @@ def get_keyboard(buts):
     first_keyboard = str(first_keyboard.decode('utf-8'))
     return first_keyboard
 
-
 def checkUser(vkId, colUsers):
     check = colUsers.find_one({"vkid": vkId})
     if check:
         return 1
     else:
         return 0
-
 
 def get_name(user_id):
     info = vk_session.method('users.get', {'user_ids': user_id})
@@ -114,7 +110,6 @@ def get_name(user_id):
     last_name = info['last_name']
     name = first_name + ' ' + last_name
     return name
-
 
 def deleteLesson(vkId, colUsers, index):
     user = colUsers.find_one({"vkid": vkId})
@@ -157,14 +152,12 @@ def check_institute(instituteName):
             return 1
     return 0
 
-
 def changeStatus(vkId, colUsers):
     user = colUsers.find_one({"vkid": vkId})
     if user["status"]:
         colUsers.update_one({"vkid": vkId}, {"$set": {"status": False}})
     else:
         colUsers.update_one({"vkid": vkId}, {"$set": {"status": True}})
-
 
 def write_msg_text(id, text):
     vk_session.method('messages.send', {'user_id': id, 'message': text, 'random_id': 0})
