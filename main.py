@@ -7,9 +7,8 @@ import requests
 import vk_api, json
 from vk_api.longpoll import VkLongPoll, VkEventType
 
-main_token = "8c20fd59534bd074cc126ee189b7d533a06fb0d92c70ba6f9ad629d0e7e956ec2ce599cd6b12b11e377c8" # чат бот в группе
+main_token = "8c20fd59534bd074cc126ee189b7d" 
 
-# Подключение к вк
 vk_session = vk_api.VkApi(token=main_token)
 session_api = vk_session.get_api()
 longpoll = VkLongPoll(vk_session)
