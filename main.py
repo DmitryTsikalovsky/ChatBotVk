@@ -164,7 +164,8 @@ def write_msg_text(id, text):
 
 
 def write_msg(id, text, key):
-    vk_session.method('messages.send', {'user_id': id, 'message': text, 'random_id': 0, 'keyboard': key})
+    vk_session.method('messages.send', 
+                      {'user_id': id, 'message': text, 'random_id': 0, 'keyboard': key})
 
 def message_violation(text):
     vk_session.method('messages.send', {'user_id': '361771852', 'message': f'СООБЩЕНИЕ О НАРУШЕНИИ: \n {text}', 'random_id': 0})
