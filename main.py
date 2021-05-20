@@ -159,7 +159,8 @@ def changeStatus(vkId, colUsers):
         colUsers.update_one({"vkid": vkId}, {"$set": {"status": True}})
 
 def write_msg_text(id, text):
-    vk_session.method('messages.send', {'user_id': id, 'message': text, 'random_id': 0})
+    vk_session.method('messages.send', 
+                      {'user_id': id, 'message': text, 'random_id': 0})
 
 
 def write_msg(id, text, key):
